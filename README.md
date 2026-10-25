@@ -73,6 +73,10 @@ macOS builds are signed and notarised and open normally. The Windows builds are 
 
 There's a [user guide](https://stoatworks-labs.com/software/sidereal/guide/) (also as [PDF](https://stoatworks-labs.com/guides/sidereal.pdf)): every target and telescope, every control, and recipes for shows.
 
+## Video
+
+[![Sidereal: the sky as Hubble and Webb photograph it, for Resolume](docs/video-thumb.png)](https://www.youtube.com/watch?v=jBJAr09OeGM)
+
 ## The one idea
 
 **Build the scene the way the pictures are made: gas lit by the stars inside it, seen
