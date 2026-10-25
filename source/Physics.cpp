@@ -81,12 +81,14 @@ const std::vector< LineSpec > kMolecular = {
 	{ 17.0348, 0.20, 0 }, { 12.2786, 0.20, 0 }, { 9.66491, 0.30, 0 }, { 0.67164, 0.25, 0 }, { 0.67308, 0.20, 0 },
 	{ 0.65628, 0.15, 0 }, { 1.64400, 0.40, 0 },
 };
+// A meteor's vapour also glows in continuum (a few thousand kelvin): a broad
+// band, so even a narrow filter sees a meteor faintly.
 const std::vector< LineSpec > kMeteorSlow = {
-	{ 0.58900, 1.0, 0 }, { 0.58959, 0.50, 0 }, { 0.43838, 0.35, 0 }, { 0.52704, 0.30, 0 },
+	{ 0.60, 0.4, 0.12 }, { 0.58900, 1.0, 0 }, { 0.58959, 0.50, 0 }, { 0.43838, 0.35, 0 }, { 0.52704, 0.30, 0 },
 	{ 0.44047, 0.20, 0 }, { 0.51837, 0.20, 0 }, { 0.51727, 0.15, 0 }, { 0.42267, 0.10, 0 },
 };
 const std::vector< LineSpec > kMeteorFast = {
-	{ 0.51837, 1.0, 0 }, { 0.51727, 0.60, 0 }, { 0.51674, 0.30, 0 }, { 0.58900, 0.40, 0 }, { 0.39337, 0.50, 0 },
+	{ 0.55, 0.4, 0.12 }, { 0.51837, 1.0, 0 }, { 0.51727, 0.60, 0 }, { 0.51674, 0.30, 0 }, { 0.58900, 0.40, 0 }, { 0.39337, 0.50, 0 },
 	{ 0.39685, 0.40, 0 }, { 0.77740, 0.80, 0 }, { 0.86800, 0.30, 0 }, { 0.43838, 0.20, 0 },
 };
 const std::vector< LineSpec > kTrain = {
@@ -642,6 +644,11 @@ double SupernovaLight( double days )
 double SupernovaPeakDay()
 {
 	return lightTable().peakDay;
+}
+
+double SupernovaRawPeak()
+{
+	return lightTable().peak;
 }
 
 double SupernovaTemperature( double days )

@@ -169,7 +169,7 @@ public:
 	{
 		double ionK, hazeIon, kO, kS, kP, kV, frontHaze, relief, faceShadow, faceGain, hazeShadow, molSkin, phaseG, selfFrac, hazeDust;
 		double emitH, emitO, emitS, emitPah, emitDust, emitScat, emitShock, emitSync, emitJets, emitOxy;
-		double dustFloor, dustRef, margin, fieldScale;
+		double dustFloor, dustRef, margin, fieldScale, haloFrac, haloWidth;
 	};
 	static const Constants& Shipped();
 

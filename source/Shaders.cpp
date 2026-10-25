@@ -62,6 +62,7 @@ const char* const kCommon = R"(
 #define HK_COARSE_MARCH 4096
 #define HK_WRONG_PARALLAX 8192
 #define HK_ECHO_SPHERE 16384
+#define HK_LENS_MAP 32768
 
 uniform int Hooks;
 uniform mat2 Cam;
@@ -854,7 +855,9 @@ vec3 galaxy( int i, vec2 s, float tauFg )
 		young = Id * C.z * arm * 1.8 * smoothstep( 0.3 * h, 1.2 * h, R );
 		Id   *= 1.0 - 0.5 * C.z;
 		float hk = smoothstep( 0.62, 0.8, fbm3( vec3( dp / h * 9.0, 9.0 + float( i ) ), 3 ) );
-		hii  = E.w * Id * hiiArm * hk * 4.0 * smoothstep( 0.4 * h, 1.5 * h, R );
+		// H II regions live where the gas is, along the arms inside a few
+		// scale lengths; past that the disk is old stars.
+		hii  = E.w * Id * hiiArm * hk * 4.0 * smoothstep( 0.4 * h, 1.5 * h, R ) * ( 1.0 - smoothstep( 2.5 * h, 4.0 * h, R ) );
 		if( E.z > 0.0 )
 			tauD = E.y * 3.0 * exp( -sq( ( R - E.z ) / ( 0.16 * E.z ) ) );
 		else
@@ -959,6 +962,8 @@ vec3 deepField( vec2 s, float tauBack )
 		zMin    = DeepB.x + 0.15;
 		if( ( Hooks & HK_LENS_BRIGHT ) != 0 )
 			boost = r / max( abs( r - DeepA.w ), 1e-3 );
+		if( ( Hooks & HK_LENS_MAP ) != 0 )
+			return vec3( length( beta - DeepA.yz ) );
 	}
 	float area = DeepA.x;
 	vec3 col   = galaxyLayer( beta, 0.016, clamp( area * 0.7 * 0.016 * 0.016, 0.0, 0.9 ), 71u, zMin, 4.0 );

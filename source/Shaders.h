@@ -93,6 +93,7 @@ enum Hook : int
 	kHookCoarseMarch  = 1 << 12,///< the march's steps evenly spaced, not fine near the pixel
 	kHookWrongParallax = 1 << 13,///< parallax grows with depth instead of falling
 	kHookEchoSphere   = 1 << 14,///< the echo's delay as if the dust were round the star, not in front
+	kHookLensMap      = 1 << 15,///< the deep field writes | beta |, the source-plane radius each pixel sees
 };
 
 } // namespace sidereal::shaders

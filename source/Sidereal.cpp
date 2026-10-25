@@ -42,8 +42,8 @@ const SiderealPlugin::Constants kShipped = {
 	24.0,// ionK: in-plane opacity per unit column per unit thickness
 	0.15,// hazeIon: the ionised interior's opacity, relative
 	3.0, // kO
-	0.4, // kS
-	0.6, // kP
+	0.75,// kS: the partly ionised zone's soft photons go first, just past the front
+	0.5, // kP: the far-UV that heats the dust and lights the aromatics, deeper
 	0.15,// kV
 	0.4, // frontHaze: the share of the haze in front of the dense gas
 	0.012,// relief: a column's height per unit column density
@@ -59,6 +59,8 @@ const SiderealPlugin::Constants kShipped = {
 	1.0, // dustRef: the field that holds dust at 90 K
 	0.15,// margin: the field buffer's overhang each side, frame heights
 	0.5, // fieldScale: the field's raster against the host's
+	0.06,// haloFrac: a star's light in its Moffat halo
+	6.0, // haloWidth: the halo's alpha in core sigmas
 };
 
 double wallSeconds()
@@ -389,7 +391,8 @@ void SiderealPlugin::updateCamera( double dt, int width, int height )
 	// The drift: a slow Lissajous wander, phase in double.
 	driftPhase += dt * DriftFromParam( params[ PT_DRIFT ] ) / kDriftReach;
 	driftPhase = std::fmod( driftPhase, 2.0 * sidereal::kPi * 1000.0 );
-	const double ox = kDriftReach * std::sin( driftPhase ), oy = 0.6 * kDriftReach * std::sin( 0.77 * driftPhase + 1.3 );
+	// Zero at phase zero: Drift at 0 leaves the camera where Pan puts it.
+	const double ox = kDriftReach * std::sin( driftPhase ), oy = 0.6 * kDriftReach * ( std::sin( 0.77 * driftPhase + 1.3 ) - std::sin( 1.3 ) );
 	const double px = PanFromParam( params[ PT_PAN_X ] ) + ox, py = PanFromParam( params[ PT_PAN_Y ] ) + oy;
 	camPan[ 0 ] = static_cast< float >( px );
 	camPan[ 1 ] = static_cast< float >( py );
@@ -632,8 +635,8 @@ void SiderealPlugin::spritePass( int width, int height )
 	glUniform1fv( where( spriteShader, "FilterScale" ), 8, scale );
 	uniform( spriteShader, "CoreSigma", static_cast< float >( core ) );
 	uniform( spriteShader, "SeeingSigma", static_cast< float >( seeing ) );
-	uniform( spriteShader, "HaloFrac", 0.06f );
-	uniform( spriteShader, "HaloWidth", 6.0f );
+	uniform( spriteShader, "HaloFrac", static_cast< float >( kShipped.haloFrac ) );
+	uniform( spriteShader, "HaloWidth", static_cast< float >( kShipped.haloWidth ) );
 	// The spike pattern, fixed to the telescope (the camera's spin turns the
 	// sky, not the spider).
 	float dirs[ 32 ] = {};
@@ -736,7 +739,7 @@ void SiderealPlugin::composite( const FFGLTextureStruct* input, GLuint hostFBO, 
 	         static_cast< float >( EchoFromParam( params[ PT_ECHO ] ) ) );
 	uniform( compositeShader, "SnC", static_cast< float >( Events::kLightPerDay ), Events::kPeakFlux, 9500.0f, 0.0f );
 	uniform( compositeShader, "RemnantGain", 2.5f );
-	uniform( compositeShader, "EchoGain", static_cast< float >( 0.0004 * scatterNorm ) );
+	uniform( compositeShader, "EchoGain", static_cast< float >( 0.01 * scatterNorm ) );
 	uniform( compositeShader, "BandGain", static_cast< float >( 0.4 * continuumNorm ) );
 	uniform( compositeShader, "ScatterGain", static_cast< float >( 0.12 * scatterNorm ) );
 

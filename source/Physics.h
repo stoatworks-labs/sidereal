@@ -253,6 +253,9 @@ double DecayHeating( double days );
 /// Tabulated once (trapezoid, 0.05 d steps), normalised to 1 at peak.
 double SupernovaLight( double days );
 double SupernovaPeakDay();
+/// The unnormalised peak, in DecayHeating's units: Arnett's rule says it is
+/// the heating on the peak day.
+double SupernovaRawPeak();
 /// The photosphere: hot and blue at peak, cooling and reddening after.
 double SupernovaTemperature( double days );
 
