@@ -781,7 +781,7 @@ void SiderealPlugin::composite( const FFGLTextureStruct* input, GLuint hostFBO, 
 	uniform( compositeShader, "DeepGain", static_cast< float >( 0.12 * deepNorm ) );
 
 	// The display.
-	exposure = kBaseExposure * std::pow( 2.0, ExposureFromParam( params[ PT_EXPOSURE ] ) + target.exposure );
+	exposure = kBaseExposure * std::pow( 2.0, ExposureFromParam( params[ PT_EXPOSURE ] ) + target.exposure + InstrumentOf( palette.instrument ).exposure );
 	uniform( compositeShader, "Exposure", static_cast< float >( exposure ) );
 	uniform( compositeShader, "StretchQ", static_cast< float >( StretchFromParam( params[ PT_STRETCH ] ) * target.stretch ) );
 	uniform( compositeShader, "Saturation", static_cast< float >( SaturationFromParam( params[ PT_SATURATION ] ) ) );

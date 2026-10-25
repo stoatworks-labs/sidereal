@@ -185,6 +185,40 @@ saturation and a per-channel clip.
   texture 0 (the source's Clip): it gets the light-curve table instead.
 - **BSD sed has no `\b`**; perl does.
 
+### Found by writing the user guide, fixed before v0.1.0
+
+The guide-writer renders every claim. These were its, and each fix is in the code with a
+comment saying what it was:
+
+- **Fire Meteor did nothing on one press in ten**: a meteor could start just off the frame
+  heading out, or be a faint scratch gone in a few frames. A press is now placed by its middle,
+  well inside any picture from 4:3 to 21:9, as a fireball on a shallow path; `--meteorcurve`
+  checks 960 presses.
+- **The Pleiades was black at its defaults** (99th percentile 0.075). It gets three stops of
+  its own exposure; `--targets` checks every target at 640×360 (at 320×180 the crowded stars
+  lift the percentile, and the black Pleiades passed).
+- **Deep-field galaxies had square edges**: the hashed layers search a 3×3 of cells and a big
+  galaxy ran past it. Each is now kept to a quarter of a cell and faded to nothing a cell from
+  its centre; a 5×5 search then draws the same pixels, bit for bit.
+- **The planetaries were filled discs.** Three things together: the shell's flux softened as
+  r² + r_in² (a ring's gas is at its drawn radius, so now the larger of the two), its wall at a
+  neutral wall's opacity (the ionised skin a texel or two thick; now a third, as a mostly
+  density-bounded shell is), and closed caps over a barrel the Ring is seen down. A shell has
+  an openness now (`Element::x2`), set on the Ring, Southern Ring and Helix and drawn for Gen
+  Planetary. The faces term was suspected and wasn't it; it is now off inside a shell's cavity
+  all the same, since the caps' column already counts that gas.
+- **Bipolar Gen Planetary lobes were dark bites**: dense shells outside the main shell, which
+  took all the light in a flat picture. They are ionised haze now.
+- **Orion's Bar threw a hard black wedge** to the corner: a dense, blunt column. It is thinner
+  and tapered.
+- **A ridge across the Pillars' feet**: the pillars' polygons ran on into the base's and the
+  columns added. Traced polygons now join by the denser of the two. Trimming them to meet
+  made a groove instead, since two soft edges meeting dip.
+- **A one-row step along the Sombrero**: the bulge's far half switched behind the dust at the
+  major axis with `?:`. It ramps across the disk's projected thickness.
+- **Hubble Infrared was two stops darker** than any other telescope on a nebula: broad bands
+  catch little line light. Instruments carry an exposure offset; it has +1.5.
+
 ## Would this hold on another rasteriser, at another raster?
 
 | check | rasters | why it holds / the tolerance's source |
@@ -244,8 +278,16 @@ exposure and stretch, the continuum normalisations' constants, the galaxies' gai
   weights F335M/F444W harder.
 - The Cosmic Cliffs' ridge is a harder line than Webb's steam; the ridge's polygon could be
   rougher, or the haze sheet's streaks stronger.
-- The planetaries through Webb's own keys (Ring, Southern Ring) are faint: their NIR lines
-  (H2, Brackett) and PAH are weak against the PlanetaryMix's normalisation.
+- The planetaries through Webb's own keys (Ring, Southern Ring) are blue and lilac where the
+  releases are orange and red: their NIR lines (H2, Brackett) and PAH are weak against the
+  PlanetaryMix's normalisation. The Ring through Hubble Narrow clips in its middle.
+- Dust has a ceiling: the extinction tables stop at τ_V 12, so Dust 1 barely dims a lit
+  pillar through NIRCam and never hides the stars inside it.
+- Flow turns the galaxies' arms (the Whirlpool's arm leaves NGC 5195 within a minute), the
+  remnant is the same size on every target (a third of the Whirlpool), and Fly replaces the
+  faint field, the infrared's embedded stars with it.
+- Hubble Infrared's gas is one flat blue; Andromeda's lanes are concentric ellipses; the
+  Horsehead's base is two lit blocks in the bottom corners.
 - Faint-star density against raster: at 320×180 the PSF floor makes rich fields crowd.
 - Audio: none. Resolume can map Fire Meteor and Supernova to its own audio and BPM; a built-in
   onset drive (regauss's) is the obvious v0.2.
@@ -253,6 +295,6 @@ exposure and stretch, the continuum normalisations' constants, the galaxies' gai
 
 ## Not done
 
-Never loaded into Resolume; never built on Windows; workflows never run; no repo, release,
-site page, user guide, demo, OpenFX port or video. About and ATTRIBUTIONS are provisional
-hand copies.
+Never loaded into Resolume on macOS. No browser demo, OpenFX port, presets or audio drive.
+Released as v0.1.0 (public repo, site page and user guide); the Windows build is gated in
+Arena on win-lab by plugin-bench's `arena/expect/sidereal.json`.

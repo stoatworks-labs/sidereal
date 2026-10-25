@@ -32,44 +32,66 @@ void Events::Reset()
 	carry     = 0.0;
 }
 
-Meteor Events::launch( double now, const EventInputs& in )
+Meteor Events::launch( double now, const EventInputs& in, bool pressed )
 {
 	Meteor m;
 	m.start = now;
-	// Where it is first seen: anywhere on or just off the picture.
-	m.x = ( uniform() * 2.0f - 1.0f ) * 1.0f;
-	m.y = ( uniform() * 2.0f - 1.0f ) * 0.6f;
+	// Where it is first seen: anywhere on or just off the picture. A pressed
+	// one is somebody asking to see a meteor, so its trail is placed by its
+	// middle, well inside any picture from 4:3 to 21:9, and it is a fireball
+	// on a shallow path: one that starts off the edge heading out, or a faint
+	// one gone in a few frames, was a press that did nothing.
+	m.x = ( uniform() * 2.0f - 1.0f ) * ( pressed ? 0.55f : 1.0f );
+	m.y = ( uniform() * 2.0f - 1.0f ) * ( pressed ? 0.32f : 0.6f );
+	const float midX = m.x, midY = m.y;
 	double sinD = 1.0;
-	if( in.shower )
+	float spin  = 0.0f;
+	if( !in.shower )
 	{
-		// Parallel paths in space, seen in perspective: each trail lies on the
-		// great circle through the radiant, moving away from it, and its length
-		// on the sky goes as the sine of its distance from the radiant.
-		const double ex = m.x - in.radiantX, ey = m.y - in.radiantY;
-		const double d  = std::sqrt( ex * ex + ey * ey );
-		m.dx            = static_cast< float >( ex / d );
-		m.dy            = static_cast< float >( ey / d );
-		sinD            = std::sin( std::min( d * kFrameAngle, physics::kPi * 0.5 ) );
-		m.speed         = static_cast< float >( kShowerSpeed );
+		spin    = uniform() * 6.2831853f;
+		sinD    = 0.35 + 0.65 * uniform();
+		m.speed = 12.0f + 58.0f * uniform();
 	}
 	else
-	{
-		const float a = uniform() * 6.2831853f;
-		m.dx          = std::cos( a );
-		m.dy          = std::sin( a );
-		sinD          = 0.35 + 0.65 * uniform();
-		m.speed       = 12.0f + 58.0f * uniform();
-	}
+		m.speed = static_cast< float >( kShowerSpeed );
 	// Entry angle above the horizon, then the classical curve: visible from
 	// x = kMeteorStartX to x = 3, x growing as e^( v sin( entry ) t / H ).
-	const double entry = ( 20.0 + 55.0 * uniform() ) * physics::kPi / 180.0;
+	const double entry = ( pressed ? 15.0 + 20.0 * uniform() : 20.0 + 55.0 * uniform() ) * physics::kPi / 180.0;
 	m.rate             = static_cast< float >( m.speed * std::sin( entry ) / physics::kScaleHeightKm );
 	const double span  = std::log( 3.0 / physics::kMeteorStartX );
 	m.duration         = static_cast< float >( span / m.rate );
 	const double path  = m.speed * m.duration;// km along the path
-	m.length           = static_cast< float >( path * sinD / kMeteorRange / kFrameAngle );
+	// Twice for a pressed shower meteor: once from its middle, then again from
+	// where that puts its start, so it still lies exactly on its radiant line.
+	for( int pass = 0; pass < ( pressed ? 2 : 1 ); ++pass )
+	{
+		if( in.shower )
+		{
+			// Parallel paths in space, seen in perspective: each trail lies on the
+			// great circle through the radiant, moving away from it, and its length
+			// on the sky goes as the sine of its distance from the radiant.
+			const double ex = m.x - in.radiantX, ey = m.y - in.radiantY;
+			const double d  = std::sqrt( ex * ex + ey * ey );
+			m.dx            = static_cast< float >( ex / d );
+			m.dy            = static_cast< float >( ey / d );
+			sinD            = std::sin( std::min( d * kFrameAngle, physics::kPi * 0.5 ) );
+		}
+		else
+		{
+			m.dx = std::cos( spin );
+			m.dy = std::sin( spin );
+		}
+		m.length = static_cast< float >( path * sinD / kMeteorRange / kFrameAngle );
+		if( pressed )
+		{
+			const float half = 0.5f * std::min( m.length, 0.8f );
+			m.x              = midX - m.dx * half;
+			m.y              = midY - m.dy * half;
+		}
+	}
 	// Brightness: a steep mass function, most faint, a few fireballs.
-	m.peak  = 6.0f * std::pow( std::max( uniform(), 0.002f ), -0.9f );
+	m.peak = pressed ? 40.0f * std::pow( std::max( uniform(), 0.01f ), -0.5f )
+	                 : 6.0f * std::pow( std::max( uniform(), 0.002f ), -0.9f );
 	m.fast  = std::clamp( ( m.speed - 20.0f ) / 40.0f, 0.0f, 1.0f );
 	m.train = m.fast > 0.6f ? 0.12f * std::min( m.peak / 30.0f, 1.0f ) : 0.0f;
 	m.trainLife = 0.3f + 1.2f * std::min( m.peak / 60.0f, 1.0f );
@@ -107,7 +129,7 @@ void Events::Advance( double now, double dt, const EventInputs& in, uint32_t see
 	}
 	for( int i = 0; i < arrivals && meteors.size() < 24; ++i )
 	{
-		meteors.push_back( launch( now, in ) );
+		meteors.push_back( launch( now, in, i < in.presses ) );
 		if( launched.size() < 4096 )
 			launched.push_back( meteors.back() );
 	}

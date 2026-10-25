@@ -38,6 +38,8 @@ MUTANTS=(
 	"source/Events.cpp|		m.dx            = static_cast< float >( ex / d );|		m.dx            = static_cast< float >( ey / d );|--meteorcurve|C++: a shower meteor's direction off its radiant line, x -> y"
 	"source/Physics.cpp|		p.gain[ f ] = ( g_hooks & PH_GREY_PALETTE ) ? 1.0 / mean : 1.0 / reference[ f ];|		p.gain[ f ] = ( g_hooks & PH_GREY_PALETTE ) ? 1.0 / mean : 2.0 / reference[ f ];|--palette|C++: each filter stretched to twice its own light, 1 -> 2"
 	"source/Physics.cpp|			value += 0.055 * std::exp( -0.5 * std::pow( ( l - 9.7 ) / 0.9, 2.0 ) );|			value += 0.055 * std::exp( -0.5 * std::pow( ( l - 8.7 ) / 0.9, 2.0 ) );|--extinction|C++: the silicate feature at 8.7 um, 9 -> 8"
+	"source/Events.cpp|	m.x = ( uniform() * 2.0f - 1.0f ) * ( pressed ? 0.55f : 1.0f );|	m.x = ( uniform() * 2.0f - 1.0f ) * ( pressed ? 1.55f : 1.0f );|--meteorcurve|C++: a pressed meteor placed anywhere, off the picture too, 0 -> 1"
+	"source/Scene.cpp|	t.exposure   = 3.0f;|	t.exposure   = 0.0f;|--targets|C++: the Pleiades at the plain exposure, black, 3 -> 0"
 )
 
 limit() {

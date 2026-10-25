@@ -118,6 +118,7 @@ struct Instrument
 	double seeing;     ///< FWHM in reference pixels added in quadrature (ground: the air)
 	double dustGlow;   ///< 1 if the bands see dust's own thermal light
 	double whiteBalance;///< 0: the hues as keyed (narrow-band stars go magenta, as they do); 1: a G star made white
+	double exposure = 0.0;///< stops: broad infrared bands catch little of a nebula's line light
 };
 
 /// The telescopes the Telescope control offers, then the per-release sets

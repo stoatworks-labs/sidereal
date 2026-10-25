@@ -101,7 +101,7 @@ public:
 	}
 
 private:
-	Meteor launch( double now, const EventInputs& in );
+	Meteor launch( double now, const EventInputs& in, bool pressed );
 
 	std::vector< Meteor > meteors, launched;
 	Supernova nova;

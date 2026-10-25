@@ -271,6 +271,38 @@ int runMeteorCurve( const Perturb& )
 		share = std::max( share, std::fabs( std::log( 1.0 / physics::kMeteorStartX ) / m.rate / m.duration
 		                                    - std::log( 1.0 / physics::kMeteorStartX ) / std::log( 3.0 / physics::kMeteorStartX ) ) );
 	Check( share < 1e-5, fmt( "every meteor peaks %.1f%% of the way through its flight", 100.0 * std::log( 1.0 / physics::kMeteorStartX ) / std::log( 3.0 / physics::kMeteorStartX ) ) );
+	// A press always shows: sporadic and shower, every pressed meteor puts at
+	// least 0.25 frame heights of its trail (or all of a shorter one) on a 4:3
+	// picture, is a fireball, and lasts long enough to see.
+	{
+		size_t presses = 0;
+		double worstOn = 1e9, worstPeak = 1e9, worstLife = 1e9;
+		for( const bool shower : { false, true } )
+		{
+			Events pressed;
+			EventInputs pin;
+			pin.shower  = shower;
+			pin.presses = 24;
+			for( int k = 0; k < 20; ++k )
+				pressed.Advance( 100.0 * k, 0.0, pin, 11 + k );
+			for( const Meteor& m : pressed.Launched() )
+			{
+				int on = 0;
+				for( int i = 0; i <= 200; ++i )
+				{
+					const double s = m.length * i / 200.0;
+					on += std::fabs( m.x + m.dx * s ) < 2.0 / 3.0 && std::fabs( m.y + m.dy * s ) < 0.5;
+				}
+				worstOn   = std::min( worstOn, m.length * on / 201.0 / std::min( static_cast< double >( m.length ), 0.25 ) );
+				worstPeak = std::min( worstPeak, static_cast< double >( m.peak ) );
+				worstLife = std::min( worstLife, static_cast< double >( m.duration ) );
+				++presses;
+			}
+		}
+		Check( presses >= 400 && worstOn >= 0.99 && worstPeak >= 40.0 && worstLife >= 0.4,
+		       fmt( "%zu presses: the least of a trail on a 4:3 picture %.2f of what is asked, the faintest peak %.0f, the shortest %.2f s",
+		            presses, worstOn, worstPeak, worstLife ) );
+	}
 	return Verdict();
 }
 
@@ -1163,6 +1195,57 @@ int runAlpha( const Perturb& )
 }
 
 //===========================================================================
+// --targets: every target, at its defaults, is a picture you can see.
+//===========================================================================
+int runTargets( const Perturb& )
+{
+	std::printf( "\n=== targets: every target at its defaults shows something, and nothing is blown out\n" );
+	// The Pleiades came out of the first build at a 99th percentile of 0.075:
+	// black, to anyone who loaded it. The floor is about half the dimmest
+	// target that looks right (the deep fields, about 0.35). At 640x360, not
+	// the small raster: at 320x180 the stars crowd and lift the percentile, so
+	// the black Pleiades read 0.26 there.
+	int dark = 0, blown = 0, broken = 0;
+	double dimmest = 1e9, hottest = 0.0;
+	const char* dimName = "";
+	for( int t = 0; t < scene::TargetCount(); ++t )
+	{
+		Rig rig;
+		if( !rig.Init( 640, 360 ) )
+			return 1;
+		rig.Set( PT_TARGET, static_cast< float >( t ) );
+		rig.Set( PT_DRIFT, 0.0f );
+		rig.Set( PT_FLOW, 0.0f );
+		rig.Render( 30 );
+		const Floats out = rig.Output();
+		std::vector< float > luma;
+		bool finite = true;
+		for( size_t i = 0; i < out.size(); i += 4 )
+		{
+			finite = finite && std::isfinite( out[ i ] ) && std::isfinite( out[ i + 1 ] ) && std::isfinite( out[ i + 2 ] );
+			luma.push_back( 0.2126f * out[ i ] + 0.7152f * out[ i + 1 ] + 0.0722f * out[ i + 2 ] );
+		}
+		std::sort( luma.begin(), luma.end() );
+		const double p99     = luma[ luma.size() * 99 / 100 ];
+		const double clipped = static_cast< double >( std::count_if( luma.begin(), luma.end(), []( float l ) { return l >= 0.999f; } ) ) / luma.size();
+		if( p99 < dimmest )
+		{
+			dimmest = p99;
+			dimName = scene::TargetName( t );
+		}
+		hottest = std::max( hottest, clipped );
+		dark += p99 < 0.18;
+		blown += clipped > 0.02;
+		broken += !finite;
+		if( p99 < 0.18 || clipped > 0.02 || !finite )
+			std::printf( "        %s: 99th percentile %.3f, clipped %.2f%%%s\n", scene::TargetName( t ), p99, 100.0 * clipped, finite ? "" : ", NOT FINITE" );
+	}
+	Check( dark == 0 && broken == 0, fmt( "%d targets, none dark: the dimmest's 99th percentile %.3f (%s), floor 0.18", scene::TargetCount(), dimmest, dimName ) );
+	Check( blown == 0, fmt( "none blown out: at most %.2f%% of a target's pixels clipped (limit 2%%)", 100.0 * hottest ) );
+	return Verdict();
+}
+
+//===========================================================================
 // The registry.
 //===========================================================================
 struct CheckEntry
@@ -1194,6 +1277,7 @@ const std::vector< CheckEntry >& checks()
 		{ "state", runState, false },
 		{ "resize", runResize, false },
 		{ "alpha", runAlpha, false },
+		{ "targets", runTargets, false },
 	};
 	return list;
 }

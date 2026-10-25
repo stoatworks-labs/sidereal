@@ -183,7 +183,7 @@ const Filter kFilters[] = {
 const Instrument kInstrumentTable[ kInstruments ] = {
 	{ "Hubble Narrow", 3, { "F502N", "F657N", "F673N" }, { BLUE, GREEN, RED }, 2.4, Spikes::Four, 45.0, 0.0, 0.0, 0.0 },
 	{ "Hubble Colour", 4, { "F435W", "F555W", "F814W", "F658N" }, { BLUE, GREEN, RED, RED }, 2.4, Spikes::Four, 45.0, 0.0, 0.0, 1.0 },
-	{ "Hubble Infrared", 2, { "F110W", "F160W" }, { BLUE, YELLOW }, 2.4, Spikes::Four, 45.0, 0.0, 0.0, 1.0 },
+	{ "Hubble Infrared", 2, { "F110W", "F160W" }, { BLUE, YELLOW }, 2.4, Spikes::Four, 45.0, 0.0, 0.0, 1.0, 1.5 },
 	{ "Webb NIRCam", 6, { "F090W", "F187N", "F200W", "F335M", "F444W", "F470N" }, { PURPLE, BLUE, CYAN, YELLOW, ORANGE, RED }, 6.5,
 	  Spikes::Webb, 0.0, 0.0, 1.0, 0.7 },
 	{ "Webb MIRI", 3, { "F770W", "F1130W", "F1500W" }, { BLUE, GREEN, RED }, 6.5, Spikes::Webb, 0.0, 0.0, 1.0, 0.0 },

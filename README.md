@@ -36,6 +36,11 @@ Resolume, on 25 October 2026: the Pillars through As Released (Hubble's WFC3 nar
 and through Webb NIRCam, the Whirlpool, and Webb's First Deep Field (`--set "Target=..."`,
 one second in).</sub>
 
+<!-- downloads:start -->
+<!-- downloads:end -->
+
+There's a [user guide](https://stoatworks-labs.com/software/sidereal/guide/) (also as [PDF](https://stoatworks-labs.com/guides/sidereal.pdf)): every target and telescope, every control, and recipes for shows.
+
 ## The one idea
 
 **Build the scene the way the pictures are made: gas lit by the stars inside it, seen
@@ -221,14 +226,19 @@ hard photons, not computed from oxygen's cooling; the faces of the gas towards u
 a height field of its column; meteors appear through space telescopes, which are above the
 air and would see none.
 
-There's no user guide, no browser demo, no OpenFX port, no video and no presets yet.
+There's a user guide, but no browser demo, no OpenFX port and no presets yet.
 
 ## Build
 
-macOS (universal: Apple Silicon and Intel). The repo isn't published yet; from a checkout:
+macOS (universal: Apple Silicon and Intel). Needs CMake 3.15+, a C++17 compiler and the FFGL
+SDK submodule:
 
 ```bash
-git submodule update --init
+git clone --recursive https://github.com/stoatworks-labs/sidereal
+```
+
+```bash
+cd sidereal
 ```
 
 ```bash
@@ -247,8 +257,8 @@ The last one copies `Sidereal.bundle` and `Sidereal Over.bundle` into
 `~/Documents/Resolume Arena/Extra Effects`. Restart Arena and they're under Sources as
 **SW Sidereal** and under Effects as **SW Sidereal Over**.
 
-Windows needs Visual Studio 2022 and vcpkg (for GLEW); see `.github/workflows/ci.yml`.
-It hasn't been built there.
+Windows needs Visual Studio 2022 and vcpkg (for GLEW); `.github/workflows/ci.yml` builds
+it on every push, and the release workflow makes the zip and the installer.
 
 ## Building and testing
 

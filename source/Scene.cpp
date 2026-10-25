@@ -399,7 +399,9 @@ Target orion( Random& r )
 	t.elements.push_back( blob( Channel::Dense, 0.65f, -0.3f, 0.4f, 0.28f, -0.4f, 0.5f, 0.6f, 0.15f, 0.06f, 0.8f ) );
 	t.elements.push_back( blob( Channel::Dense, 0.6f, 0.45f, 0.35f, 0.2f, 0.3f, 0.45f, 0.5f, 0.12f, 0.05f, 0.8f ) );
 	// The Orion Bar: the ionisation front seen edge-on, south-east of the Trapezium.
-	t.elements.push_back( column( 0.05f, -0.24f, 0.38f, -0.08f, 0.03f, 0.03f, 1.3f, 0.12f, 0.01f ) );
+	// Thin enough to let light through and tapered at its near end: a dense,
+	// blunt Bar threw a hard black wedge of shadow to the corner of the frame.
+	t.elements.push_back( column( 0.05f, -0.24f, 0.38f, -0.08f, 0.008f, 0.025f, 0.4f, 0.12f, 0.01f ) );
 	// The Dark Bay: dust in front, intruding from the north-east.
 	t.elements.push_back( blob( Channel::Foreground, -0.32f, 0.12f, 0.2f, 0.07f, -0.5f, 1.2f, 0.1f, 0.05f, 0.03f, 0.7f ) );
 	t.elements.push_back( blob( Channel::Foreground, -0.15f, 0.05f, 0.09f, 0.035f, -0.3f, 0.9f, 0.1f, 0.03f, 0.02f, 0.7f ) );
@@ -457,14 +459,18 @@ Target crab( Random& r )
 }
 
 /// A planetary nebula's shell, lit from inside by its white dwarf.
-void planetary( Target& t, float x, float y, float a, float b, float angle, float fraction, float knots, float halo, float wd )
+void planetary( Target& t, float x, float y, float a, float b, float angle, float fraction, float knots, float halo, float wd,
+                float open = 0.0f )
 {
 	t.mix      = PlanetaryMix();
 	t.elements.push_back( shell( Channel::Dense, x, y, a, b, angle, fraction, 0.9f, 0.05f, knots ) );
+	t.elements.back().x2 = open;
 	if( halo > 0.0f )
 	{
 		t.elements.push_back( shell( Channel::Haze, x, y, a * 1.55f, b * 1.55f, angle, 0.35f, halo, 0.6f, 0.0f ) );
+		t.elements.back().x2 = open;
 		t.elements.push_back( shell( Channel::Haze, x, y, a * 2.1f, b * 2.1f, angle, 0.12f, 0.4f * halo, 0.6f, 0.0f ) );
+		t.elements.back().x2 = open;
 	}
 	t.sources.push_back( source( x, y, 0.0f, wd, 110000.0f, true ) );
 	t.sources.back().soft = ( 1.0f - fraction ) * std::min( a, b );
@@ -475,7 +481,10 @@ Target ring( Random& r )
 	Target t;
 	t.name       = "Ring";
 	t.asReleased = I_RING_NIRCAM;
-	planetary( t, 0.0f, 0.0f, 0.2f, 0.155f, 0.25f, 0.24f, 0.6f, 0.08f, 0.004f );
+	// A barrel seen nearly down its axis: open. Two stops up, as Webb's
+	// picture is: its rim is thin.
+	planetary( t, 0.0f, 0.0f, 0.2f, 0.155f, 0.25f, 0.24f, 0.6f, 0.08f, 0.004f, 0.8f );
+	t.exposure  = 2.0f;
 	t.haze      = 0.0f;
 	t.warpScale = 8.0f;
 	t.warp      = 0.006f;
@@ -492,7 +501,7 @@ Target southernRing( Random& r )
 	Target t;
 	t.name       = "Southern Ring";
 	t.asReleased = I_SOUTHERN_RING;
-	planetary( t, 0.0f, 0.0f, 0.33f, 0.21f, 0.35f, 0.28f, 0.35f, 0.12f, 0.0016f );
+	planetary( t, 0.0f, 0.0f, 0.33f, 0.21f, 0.35f, 0.28f, 0.35f, 0.12f, 0.0016f, 0.6f );
 	// The visible companion beside the white dwarf.
 	star( t, 0.004f, 0.003f, 22.0f, 9500.0f, 0 );
 	t.haze      = 0.0f;
@@ -511,9 +520,10 @@ Target helix( Random& r )
 	Target t;
 	t.name       = "Helix";
 	t.asReleased = I_HELIX;
-	planetary( t, 0.0f, 0.0f, 0.36f, 0.31f, 0.4f, 0.32f, 1.0f, 0.05f, 0.0016f );
+	planetary( t, 0.0f, 0.0f, 0.36f, 0.31f, 0.4f, 0.32f, 1.0f, 0.05f, 0.0016f, 0.7f );
 	// The outer arc, offset: the two rings of a helix seen end on.
 	t.elements.push_back( shell( Channel::Dense, 0.04f, -0.03f, 0.44f, 0.36f, 0.6f, 0.18f, 0.5f, 0.04f, 0.4f ) );
+	t.elements.back().x2 = 0.7f;
 	t.haze      = 0.0f;
 	t.warpScale = 6.0f;
 	t.warp      = 0.012f;
@@ -555,6 +565,9 @@ Target pleiades( Random& r )
 	t.name       = "Pleiades";
 	t.mix        = StarlightMix();
 	t.asReleased = I_BACKYARD;
+	// Lit dust with no glow of its own is faint next to emission: the
+	// backyard pictures of it are long exposures.
+	t.exposure   = 3.0f;
 	const float s = 0.62f;// frame heights per degree
 	struct Sister
 	{
@@ -831,11 +844,14 @@ Target genPlanetary( Random& r )
 	           r.range( 0.0f, 0.15f ), 0.0012f );
 	if( r.uniform() < 0.45f )
 	{
-		// Bipolar: two lobes along the axis, pinched by a dusty waist.
+		// Bipolar: two lobes along the axis, pinched by a dusty waist. The
+		// lobes are ionised gas the light reaches round the waist in depth:
+		// as dense shells outside the main one they caught none of it, and
+		// stood over the nebula as two dark bites.
 		const float ang = r.range( 0.0f, 3.14f ), l = a * r.range( 1.0f, 1.8f );
 		const float cx = std::cos( ang ) * l, cy = std::sin( ang ) * l;
-		t.elements.push_back( shell( Channel::Dense, cx, cy, l * 0.7f, l * 0.45f, ang, 0.4f, 0.6f, 0.05f, 0.0f ) );
-		t.elements.push_back( shell( Channel::Dense, -cx, -cy, l * 0.7f, l * 0.45f, ang, 0.4f, 0.6f, 0.05f, 0.0f ) );
+		t.elements.push_back( shell( Channel::Haze, cx, cy, l * 0.7f, l * 0.45f, ang, 0.4f, 1.2f, 0.6f, 0.0f ) );
+		t.elements.push_back( shell( Channel::Haze, -cx, -cy, l * 0.7f, l * 0.45f, ang, 0.4f, 1.2f, 0.6f, 0.0f ) );
 	}
 	t.haze      = 0.0f;
 	t.warpScale = r.range( 5.0f, 9.0f );
@@ -845,6 +861,12 @@ Target genPlanetary( Random& r )
 	t.dustRatio  = 1.5f;
 	t.snX        = 0.55f;
 	t.snY        = 0.3f;
+	// Most are barrels or rings seen near their axis, some closed. Drawn last,
+	// so a seed's shape and stars are what they were before.
+	const float open = r.range( 0.3f, 0.9f );
+	for( Element& e : t.elements )
+		if( e.shape == Shape::Shell )
+			e.x2 = open;
 	return t;
 }
 

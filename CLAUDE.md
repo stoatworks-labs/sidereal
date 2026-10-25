@@ -43,9 +43,10 @@ gain rule (`physics::BuildPalette` and each target's `Mix`), the continuum norma
   `--spikes` (count, angles, 1 / r^2), `--reddening` (CCM through each filter, in the picture).
 - **The sky**: `--parallax`, `--lens` (surface brightness and the Einstein ring), `--echo`,
   `--meteor`.
-- **The rest**: `--state`, `--resize`, `--alpha`.
+- **The rest**: `--state`, `--resize`, `--alpha`, `--targets` (every target visible at its
+  defaults, none blown out).
 - The checks can fail: `./build/sdtest --negative` (13 wrong models), `tools/mutate.sh`
-  (16 mutants). `SDTEST_DUMP=dir` makes `--spikes` write its frames.
+  (18 mutants). `SDTEST_DUMP=dir` makes `--spikes` write its frames.
 - No dead controls: `python3 tools/sweep.py` (both plugins; `--bare` drops the contexts).
 - Render cost: `./build/sdtest --bench`.
 - `SDTEST_RENDERER=software` runs any of it on Apple's software renderer (verify runs
@@ -73,16 +74,18 @@ gain rule (`physics::BuildPalette` and each target's `Mix`), the continuum norma
 - `sidereal_core` is an OBJECT library: each plugin registers itself from a file-scope
   constructor nothing references.
 - The macOS build must be universal. Check with `lipo`, never the build log.
-- **Provisional hand copies:** `source/StoatworksAbout*.h` (guide = "", no user guide yet)
-  and `ATTRIBUTIONS.md`. Once the project is registered in stoatworks-backend,
-  `sync-about.py` and `sync-attributions.py` generate them; edit them there then.
-- Local only: no remote, nothing released, not on the website.
+- **Generated, do not edit here:** `source/StoatworksAbout*.h` (stoatworks-backend's
+  `sync-about.py`, from the website's projects.json), `ATTRIBUTIONS.md` and the README's
+  `attributions` block (`sync-attributions.py`), `.github/FUNDING.yml` and
+  `.github/ISSUE_TEMPLATE/` (the backend's syncs), and the README's `downloads` block
+  (`release/gen-downloads.py`).
+- Public at <https://github.com/stoatworks-labs/sidereal>, released as v0.1.0 on
+  25 October 2026, with a page and a user guide on stoatworks-labs.com.
 
 ## Not done yet
-- Never loaded into Resolume on either platform. No Windows build. The workflows in
-  `.github/` have never run.
-- No GitHub repo, no release, no website page, no user guide, no browser demo, no OpenFX
-  port, no video, no presets.
+- Never loaded into Resolume on macOS. The Windows build is gated in Arena on win-lab
+  (plugin-bench's `arena/expect/sidereal.json`).
+- No browser demo, no OpenFX port, no presets, no audio drive.
 
 ## Diagnostics
 

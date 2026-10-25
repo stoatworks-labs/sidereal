@@ -160,7 +160,7 @@ step "Checks (this Mac's GPU)"
 # check runs at 1280x720 and 320x180 itself, except psf (1920x1080 and
 # 3840x2160: the core is under a pixel at CI's raster) and spikes (1280x720:
 # a spike's 1 / r^2 needs a few dozen pixels); AGENTS.md says why, check by check.
-CHECKS="photons strata psf spikes reddening parallax lens echo meteor state resize alpha"
+CHECKS="photons strata psf spikes reddening parallax lens echo meteor state resize alpha targets"
 for check in $CHECKS hardness extinction cosmology supernova meteorcurve palette names; do
 	if out=$( "$SDTEST" --$check 2>&1 ); then
 		printf '   ok   sdtest --%s: %s checks\n' "$check" "$( printf '%s\n' "$out" | grep -c '^  ok' )"

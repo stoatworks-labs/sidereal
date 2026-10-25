@@ -50,7 +50,7 @@ struct Element
 	Shape shape     = Shape::Blob;
 	Channel channel = Channel::Dense;
 	float x = 0, y = 0;  ///< centre, or a column's base, or a sheet's edge
-	float x2 = 0, y2 = 0;///< a column's tip; a sheet's direction (towards denser)
+	float x2 = 0, y2 = 0;///< a column's tip; a sheet's direction (towards denser); x2, a shell's openness (0 closed, 1 a barrel seen end on)
 	float a = 0.1f, b = 0.1f;///< radii (blob, shell, filaments); a column's base and tip radii
 	float angle     = 0;  ///< radians, anticlockwise
 	float density   = 1;  ///< column density at the core

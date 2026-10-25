@@ -222,6 +222,10 @@ void main()
 
 	vec4 A = vec4( 0.0 );
 	vec4 B = vec4( 0.0 );
+	// Traced shapes join where they meet, by the denser of the two: summed,
+	// a pillar running on into the cloud it stands on was a ridge across its
+	// feet, and trimmed to meet it, a groove.
+	float polyCol = 0.0, polyIon = 0.0;
 	for( int i = 0; i < ElementCount; ++i )
 	{
 		vec4 t0 = texelFetch( Elements, ivec2( i * 5 + 0, 0 ), 0 );// shape, channel, depth, polygon start
@@ -272,10 +276,17 @@ void main()
 			float outer = sqrt( max( 1.0 - r * r, 0.0 ) );
 			float inner = sqrt( max( ri * ri - r * r, 0.0 ) );
 			float chord = max( sqrt( max( 1.0 - ri * ri, 1e-4 ) ), 1e-3 );
-			v = ( outer - inner ) / chord;
+			// An open shell is a barrel seen down its axis, as the Ring is: the
+			// gas over its cavity (a closed shell's caps) thins by its openness,
+			// its wall does not. Closed, the caps filled every ring in.
+			float caps = 1.0 - t1.z * ( 1.0 - smoothstep( ri - edge, ri + edge, r ) );
+			v = ( outer - inner ) / chord * caps;
 			v *= 1.0 - smoothstep( 1.0 - edge, 1.0 + edge, r );
-			// The slice: density / ( 2 R chord ) between ri and 1.
-			slice = smoothstep( ri - edge, ri + edge, r ) * ( 1.0 - smoothstep( 1.0 - edge, 1.0 + edge, r ) ) / ( 2.0 * min( t2.x, t2.y ) * chord );
+			// The slice: density / ( 2 R chord ) between ri and 1, at a third of
+			// a neutral wall's opacity. A planetary's shell is mostly ionised
+			// right through (density-bounded): at the full opacity the ionised
+			// skin was a texel or two of the wall, and the ring didn't show.
+			slice = 0.35 * smoothstep( ri - edge, ri + edge, r ) * ( 1.0 - smoothstep( 1.0 - edge, 1.0 + edge, r ) ) / ( 2.0 * min( t2.x, t2.y ) * chord );
 			if( t4.z > 0.0 )
 			{
 				// Knots: clumps strung out radially, on the shell's inner face.
@@ -313,7 +324,13 @@ void main()
 		float detail = t3.x * max( 0.0, 1.0 + t4.x * turb * ( detailNoise - 0.5 ) * 4.0 );
 		v *= detail;
 
-		if( chan == 0 )
+		if( chan == 0 && shape == 2 )
+		{
+			v *= GasScale;
+			polyCol = max( polyCol, v );
+			polyIon = max( polyIon, IonK * v / max( t3.y, 1e-3 ) );
+		}
+		else if( chan == 0 )
 		{
 			v *= GasScale;
 			A.x += v;
@@ -336,6 +353,9 @@ void main()
 		else
 			B.z += v;
 	}
+
+	A.x += polyCol;
+	A.y += polyIon;
 
 	// The ionised interior, everywhere, patchy.
 	float haze = HazeLevel * HazeMul * max( 0.0, 1.0 + 2.8 * ( fbm3( vec3( p1 * HazeScale, FlowTime * 0.3 + 2.0 ), 4 ) - 0.5 ) );
@@ -447,9 +467,12 @@ void main()
 		float tau = tauD + tauH;
 
 		// The flux falls with the distance in depth too: gas seen near the
-		// star in the picture can be far in front of or behind it (a shell's
-		// caps are at its inner radius however close they look).
-		float df = d3 * d3 + SrcB[ k ].w * SrcB[ k ].w;
+		// star in the picture can be far in front of or behind it. A shell's
+		// gas is all at least its inner radius from its star: its caps at that
+		// radius however close they look, its ring at the radius it is drawn.
+		// (Adding the two in quadrature put the ring up to half as far again
+		// as it is, and a third as bright, and filled every ring in.)
+		float df = max( d3 * d3, SrcB[ k ].w * SrcB[ k ].w );
 		float F  = SrcA[ k ].w / df;
 		float Fv = SrcB[ k ].y / df;
 		float ko = ( Hooks & HK_ONE_ZONE ) != 0 ? 1.0 : KO;
@@ -484,6 +507,11 @@ void main()
 		// higher the star stands off the plane.
 		vec3 L      = vec3( dv * FieldExtent, hh ) / d3;
 		float cosI  = max( dot( n, L ), 0.0 ) * surface;
+		// Inside a shell's cavity the gas is its caps, which its column already
+		// counts; their slope read as a front facing the star lit every
+		// planetary's middle flat.
+		if( SrcB[ k ].w > 0.0 )
+			cosI *= smoothstep( 0.85, 1.05, d3 / SrcB[ k ].w );
 		// What stands in a face's way is bounded: past a few optical depths
 		// of in-plane path the ray has long since risen clear of the gas.
 		float faceT = FaceShadow * 6.0 * ( 1.0 - exp( -tauD / 6.0 ) ) * exp( -4.0 * hh / max( r, 1e-3 ) ) + tauH;
@@ -864,8 +892,11 @@ vec3 galaxy( int i, vec2 s, float tauFg )
 			tauD = E.y * exp( -R / ( 1.4 * h ) ) * ( 0.4 + 2.2 * dustArm );
 		tauD *= ( 0.5 + clump ) / ci;
 	}
-	// The bulge's far half is behind the disk's dust on the near side.
-	float front = u.y < 0.0 ? 1.0 : 0.15;
+	// The bulge's far half is behind the disk's dust on the near side. The
+	// change is spread over the disk's own thickness in the picture: a hard
+	// switch at the major axis was a one-row step along an edge-on galaxy.
+	float halfT = 0.08 * h * sqrt( 1.0 - B.x * B.x ) + 1e-4;
+	float front = mix( 0.15, 1.0, smoothstep( halfT, -halfT, u.y ) );
 	float bulge = Ib * ( 1.0 - 0.5 * front * ( 1.0 - exp( -tauD ) ) );
 	float tauMix = 0.4 * tauD;
 	vec3 col = contLut( ContLut, 0, F.x, tauFg + tauMix ) * Id * exp( -0.3 * tauD )
@@ -908,8 +939,15 @@ vec3 galaxyLayer( vec2 beta, float cell, float occupancy, uint salt, float zMin,
 			float z  = max( zMin, 0.25 + 5.5 * pow( u01( h4 ), 1.7 ) );
 			// Angular size: a physical size over the angular diameter
 			// distance, which stops shrinking past z ~ 1.6.
-			float re = sizeKpc * ( 0.5 + u01( h5 ) ) / pow( 1.0 + z, 0.8 ) * 1e-3 / angularDistance( z ) / DeepB.w;
+			// The search reaches one cell from the pixel's own and no further,
+			// so a galaxy is kept to a quarter of a cell and faded to nothing a
+			// cell from its centre: one cut off where the search stops was a
+			// square edge in the sky.
+			float re = min( sizeKpc * ( 0.5 + u01( h5 ) ) / pow( 1.0 + z, 0.8 ) * 1e-3 / angularDistance( z ) / DeepB.w, 0.25 * cell );
 			vec2 d   = beta - pos;
+			float reach = smoothstep( cell, 0.5 * cell, length( d ) );
+			if( reach <= 0.0 )
+				continue;
 			float ca = u01( h6 ) * 2.0 - 1.0;
 			float sa = sqrt( 1.0 - ca * ca ) * ( ( h6 & 1u ) == 0u ? 1.0 : -1.0 );
 			vec2 q   = vec2( dot( d, vec2( ca, sa ) ), dot( d, vec2( -sa, ca ) ) );
@@ -939,7 +977,7 @@ vec3 galaxyLayer( vec2 beta, float cell, float occupancy, uint salt, float zMin,
 			}
 			// Brighter in the past: star formation was ~ ( 1 + z )^2.5 busier.
 			float lum = pow( max( u01( h ^ 0x85ebca6bu ), 1e-3 ), -0.7 ) * pow( 1.0 + z, 2.5 );
-			col += galaxyLut( T, z ) * sb * lum;
+			col += galaxyLut( T, z ) * sb * lum * reach;
 		}
 	return col;
 }
