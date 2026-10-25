@@ -40,6 +40,35 @@ and through Webb NIRCam, the Whirlpool, and Webb's First Deep Field (`--set "Tar
 one second in).</sub>
 
 <!-- downloads:start -->
+
+## Download
+
+**[v0.1.0](https://github.com/stoatworks-labs/sidereal/releases/tag/v0.1.0)** — prebuilt for macOS and Windows. Pick your platform:
+
+<details>
+<summary><b>macOS</b> — Universal (Apple Silicon + Intel)</summary>
+
+| Build | Download | Size |
+| --- | --- | --- |
+| Universal (Apple Silicon + Intel) · .dmg disk image | [`sidereal-0.1.0-macos-universal.dmg`](https://github.com/stoatworks-labs/sidereal/releases/download/v0.1.0/sidereal-0.1.0-macos-universal.dmg) | 718 KB |
+| Universal (Apple Silicon + Intel) · .zip archive | [`sidereal-macos-universal.zip`](https://github.com/stoatworks-labs/sidereal/releases/latest/download/sidereal-macos-universal.zip) | 637 KB |
+
+</details>
+
+<details>
+<summary><b>Windows</b> — x64</summary>
+
+| Build | Download | Size |
+| --- | --- | --- |
+| x64 · .exe installer | [`sidereal-0.1.0-windows-x86_64-setup.exe`](https://github.com/stoatworks-labs/sidereal/releases/download/v0.1.0/sidereal-0.1.0-windows-x86_64-setup.exe) | 291 KB |
+| x64 · .zip archive | [`sidereal-windows-x86_64.zip`](https://github.com/stoatworks-labs/sidereal/releases/latest/download/sidereal-windows-x86_64.zip) | 350 KB |
+
+</details>
+
+All builds, checksums and release notes: [github.com/stoatworks-labs/sidereal/releases](https://github.com/stoatworks-labs/sidereal/releases).
+
+macOS builds are signed and notarised and open normally. The Windows builds are unsigned, so SmartScreen warns once.
+
 <!-- downloads:end -->
 
 There's a [user guide](https://stoatworks-labs.com/software/sidereal/guide/) (also as [PDF](https://stoatworks-labs.com/guides/sidereal.pdf)): every target and telescope, every control, and recipes for shows.
