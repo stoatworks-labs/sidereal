@@ -1,32 +1,38 @@
 # Attributions
 
-Sidereal is built on other people's work. This file lists what that work is, who did it,
-and what it is doing here.
+Sidereal is built on other people's work. This file lists what that work is, who did
+it, and what it is doing here.
 
-**Provisional hand copy (2026-10-25).** The fleet's attributions files are generated: the
-master lists live in the `stoatworks-backend` repo and are pushed out by
-`scripts/sync-attributions.py`. Sidereal isn't registered there yet, so this one was
-written by hand in the same shape. Once it is registered, the generated file replaces
-this one and the entries below move into the backend's lists.
+It is generated — the master lists live in the `stoatworks-backend` repo and are
+pushed out by `scripts/sync-attributions.py`. Edit it there, not here.
 
-## Code derived from other people's work
+## Code we derived from other people's work
 
 Someone else solved this first, and this project would not exist in its current form without their work.
 
-### The harness, the tooling and the plugin's shape — Stoatworks ferrofluid
+### The harness, the tooling and the plugin's shape — Stoatworks schlieren
 
-<https://github.com/stoatworks-labs/ferrofluid>  
+<https://github.com/stoatworks-labs/schlieren>  
 Licence: MIT  
 Copyright: Stoatworks Labs
 
-Two bundles from one OBJECT library (`CMakeLists.txt`), a host order per plugin with the
-About block last (`source/Controls.cpp`), the clock-unit vote and the GL state capture
-(`source/Sidereal.cpp`, `source/GLState.h`), `source/PassBuffer.{h,cpp}` and
-`source/Diag.{h,cpp}`; the harness's rig, PNG writer, look card, cue sheets,
-`--pipe`/`--film` (SIGPIPE ignored, a closed stdout an exit of 1), `--negative` with its
-Perturb, `--state` and `--offline`; `tools/verify.sh`, `tools/mutate.sh`,
-`tools/glslc.sh`, `tools/sweep.py`, the workflows and `scripts/release-lib.sh`. Ferrofluid
-had them from schlieren, fiche, honeydew, millpond, radar and vectrix. All adapted.
+The harness's rig, PNG writer, look card, cue sheets, --pipe/--film (SIGPIPE ignored, a closed stdout an exit of 1), --negative with its Perturb, --state and --offline; the host-clock unit vote; tools/verify.sh, tools/mutate.sh, tools/glslc.sh, tools/sweep.py, the CI and release workflows and scripts/release-lib.sh. By way of a sibling plugin that is not public yet, which had them from schlieren and fiche. All adapted.
+
+### Two plugins from one core, and the control table's shape — Stoatworks honeydew
+
+<https://github.com/stoatworks-labs/honeydew>  
+Licence: MIT  
+Copyright: Stoatworks Labs
+
+CMakeLists.txt's two bundles from one OBJECT library, a host order per plugin with the About block last (source/Controls.cpp), and the harness's rule that an option is set by its name.
+
+### Pass buffers, GL state and the log — Stoatworks millpond
+
+<https://github.com/stoatworks-labs/millpond>  
+Licence: MIT  
+Copyright: Stoatworks Labs
+
+source/PassBuffer.{h,cpp} and source/Diag.{h,cpp} are millpond's; source/GLState.h is radar's, which is vectrix's, from resolume-scopes.
 
 ## Third-party code this project uses
 
@@ -38,7 +44,7 @@ Libraries, SDKs and frameworks the project is built on or bundles.
 Licence: BSD-3-Clause  
 Copyright: FreeFrame
 
-Vendored as a git submodule at external/ffgl.
+Vendored as a git submodule at external/ffgl (third_party/ffgl in oxbow).
 
 The plugin ABI itself. An FFGL effect or source is defined by this SDK's headers — there is no other way to be loadable by Resolume Arena and Avenue.
 
@@ -48,65 +54,74 @@ The plugin ABI itself. An FFGL effect or source is defined by this SDK's headers
 Licence: BSD-3-Clause (with Mesa 3-D and Khronos components)  
 Copyright: Milan Ikits, Marcelo E. Magallon and Lev Povalahev
 
-Taken from vcpkg on Windows (`vcpkg.json`). Resolves OpenGL entry points there, where the
-system headers stop at OpenGL 1.1. macOS uses the system OpenGL framework.
+Arrives inside the FFGL submodule at external/ffgl/deps/glew-2.1.0. Not fetched separately.
 
-## Pictures the targets were traced from
+Resolves OpenGL entry points on Windows, where the system headers stop at OpenGL 1.1.
 
-No image is shipped, sampled or embedded. The targets drawn from pictures are outlines of a
-few dozen points each, traced by eye from these releases, plus the colour key each release
-published.
+### libpng
 
-- **Pillars of Creation** — NASA, ESA and the Hubble Heritage Team (STScI/AURA), 2014
-  (heic1501a); and NASA, ESA, CSA, STScI (J. DePasquale, A. Koekemoer, A. Pagan), 2022
-  NIRCam and MIRI (weic2216a, weic2218b).
-- **Cosmic Cliffs** — NASA, ESA, CSA, STScI, 2022 (carinanebula3).
-- **Horsehead** — ESO, 2002 VLT (eso0202a, CC BY 4.0); NASA, ESA and the Hubble Heritage
-  Team, 2013 (heic1307a).
-- **Colour keys** — the filter-to-hue tables published with the Webb releases of the
-  Pillars (NIRCam: F090W purple … F470N red; MIRI: F770W blue, F1130W green, F1500W red),
-  the Cosmic Cliffs, the Southern Ring, the Ring Nebula (ESA/Webb weic2320) and SMACS 0723,
-  and with Hubble's 2014 Pillars (F502N blue, F657N green, F673N red).
+<http://www.libpng.org/pub/png/libpng.html>  
+Licence: PNG Reference Library License (libpng)  
+Copyright: the PNG Reference Library authors
 
-The other famous targets are built from their published descriptions (structure, filters,
-orientation), not traced.
+Arrives inside the FFGL submodule, under the SDK's CustomThumbnail sample.
 
-## Work checked against
+Part of the upstream SDK tree rather than something these plugins call directly — listed because it is present in the checkout.
 
-No code was taken from these — but they were how I knew I had it right, or where the
-numbers came from.
+## Work we checked ourselves against
 
-### Interstellar extinction — J. A. Cardelli, G. C. Clayton and J. S. Mathis, ApJ 345 (1989) 245; R. Indebetouw et al., ApJ 619 (2005) 931; B. T. Draine, ARA&A 41 (2003) 241
+No code was taken from these — but they were how we knew we had it right, and that is worth saying out loud.
 
-CCM's a(x) + b(x)/R_V from 0.125 to 3.33 µm in `source/Physics.cpp`, and their Table 3,
-which `sdtest --extinction` holds it to. Past 3.33 µm the infrared power law is continued
-with Indebetouw's flattening (A_λ about 0.4 A_K from 4 to 8 µm) and the silicate features
-at 9.7 and 18 µm from Draine's review: that extension is this repo's, not CCM's.
+### The relationship between infrared, optical and ultraviolet extinction — J. A. Cardelli, G. C. Clayton and J. S. Mathis, ApJ 345 (1989) 245
 
-### Recombination and nebular lines — D. E. Osterbrock and G. J. Ferland, Astrophysics of Gaseous Nebulae and Active Galactic Nuclei (2006), tables 4.2 and 4.4
+a(x) + b(x)/R_V from 0.125 to 3.33 um in source/Physics.cpp, and their Table 3, which sdtest --extinction holds it to. Past 3.33 um the curve is continued with Indebetouw et al.'s flattening (ApJ 619, 2005) and the silicate features from Draine's review (ARA&A 41, 2003); that extension is this repo's.
 
-Case B ratios at 10⁴ K for the Balmer, Paschen and Brackett lines in `source/Physics.cpp`.
+### Astrophysics of Gaseous Nebulae and Active Galactic Nuclei — D. E. Osterbrock and G. J. Ferland (2006), tables 4.2 and 4.4
 
-### Supernova light — D. K. Nadyozhin, ApJS 92 (1994) 527; W. D. Arnett, ApJ 253 (1982) 785; B. Leibundgut, A&ARv 10 (2000) 179
+The case B recombination ratios at 10^4 K for the Balmer, Paschen and Brackett lines in source/Physics.cpp.
 
-The ⁵⁶Ni → ⁵⁶Co → ⁵⁶Fe heating (6.45 e^{−t/8.8} + 1.45 e^{−t/111.3} × 10⁴³ erg/s per solar
-mass of nickel), Arnett's diffusion integral, and the observed decline of type Ia tails
-(about 1.4 mag per 100 days) that `sdtest --supernova` holds the tail to.
+### Supernova light: the decay heating, the diffusion and the tail — D. K. Nadyozhin, ApJS 92 (1994) 527; W. D. Arnett, ApJ 253 (1982) 785; B. Leibundgut, A&ARv 10 (2000) 179
 
-### Meteors — E. J. Öpik, Physics of Meteor Flight in the Atmosphere (1958); D. W. R. McKinley, Meteor Science and Engineering (1961)
+The 56Ni -> 56Co -> 56Fe heating, Arnett's diffusion integral (whose rule sdtest --supernova checks), and the observed decline of type Ia tails that the tail is held to.
 
-The classical single-body light curve, I ∝ (ρ/ρ_max)(1 − ρ/3ρ_max)², used in
-`source/Physics.cpp` and measured in the picture by `sdtest --meteor`.
+### The classical meteor light curve — E. J. Opik, Physics of Meteor Flight in the Atmosphere (1958); D. W. R. McKinley, Meteor Science and Engineering (1961)
 
-### Colour from a stretch — R. Lupton et al., PASP 116 (2004) 133
+I ~ (rho/rho_max)(1 - rho/3 rho_max)^2, in source/Physics.cpp, measured in the picture by sdtest --meteor.
+
+### Preparing red-green-blue images from CCD data — R. Lupton et al., PASP 116 (2004) 133
 
 The asinh stretch of the mean, applied to every channel, in the composite shader.
 
-### Cosmology — E. L. Wright, PASP 118 (2006) 1711
+### A cosmology calculator for the World Wide Web — E. L. Wright, PASP 118 (2006) 1711
 
-His calculator's 1651.9 Mpc at z = 1 (H0 = 70, Ωm = 0.3, flat) is what
-`sdtest --cosmology` holds the angular diameter distance to.
+1651.9 Mpc at z = 1 (H0 70, Omega_m 0.3, flat), which sdtest --cosmology holds the angular diameter distance to.
 
-### Filters — the STScI instrument handbooks for WFC3, ACS, NIRCam and MIRI
+### Analytical expressions for the Sersic profile's b_n — L. Ciotti and G. Bertin, A&A 352 (1999) 447
 
-Pivot wavelengths and widths of every filter in `source/Physics.cpp`.
+The expansion of b_n in every galaxy's bulge.
+
+### Radiative transfer in a clumpy universe — P. Madau, ApJ 441 (1995) 18
+
+The Lyman-alpha forest's effective depth against redshift, reduced to one power law, in the deep field's galaxy colours.
+
+### The WFC3, ACS, NIRCam and MIRI instrument handbooks — Space Telescope Science Institute
+
+The pivot wavelength and width of every filter in source/Physics.cpp.
+
+## Inspirations
+
+What this set out to be. No code, assets or binaries from any of these were used or examined — the debt is to the idea.
+
+### Hubble's and Webb's published pictures
+
+The Pillars of Creation (NASA, ESA, Hubble Heritage Team, 2014; NASA, ESA, CSA, STScI, 2022), the Cosmic Cliffs (NASA, ESA, CSA, STScI, 2022) and the Horsehead (ESO, 2002, CC BY 4.0; NASA, ESA, Hubble Heritage Team, 2013): their outlines traced by eye, a few dozen points each, and the filter-to-colour keys published with each release. No image is shipped, sampled or embedded.
+
+## Standards and published specifications
+
+What the implementation is measured against.
+
+- **Melissa E. O'Neill, PCG (2014)** — the integer hash behind every star, galaxy and turbulence cell, exact in 32 bits on every GPU.
+
+## Getting this wrong
+
+If your work is here and the description is inaccurate, the licence is wrong, or you would rather not be listed — open an issue and it will be fixed.

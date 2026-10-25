@@ -236,7 +236,7 @@ private:
 	double continuumNorm = 1.0, scatterNorm = 1.0, deepNorm = 1.0, meteorNorm = 1.0;
 	double coreSigmaPx = 1.0, seeingSigmaPx = 0.5, spikeLengthPx = 60.0;
 
-	// Time (the clock unit vote: rosette's, by way of ferrofluid).
+	// Time (the clock unit vote: rosette's, by way of schlieren's siblings).
 	double hostTime = -1.0, lastRawTime = -1.0, lastWallTime = -1.0, wallStart = -1.0;
 	double clockScale = 0.0;
 	int secondsVotes = 0, millisVotes = 0, clockFrames = 0;

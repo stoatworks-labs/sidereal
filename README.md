@@ -263,6 +263,10 @@ sweep and the bench. Under eight minutes on this Mac, most of it the mutants' bu
 session set `TMPDIR` to a writable scratch directory first. `CLAUDE.md` has the harness's
 commands.
 
+<!-- attributions:start -->
+This project is built on other people's work — see [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
+<!-- attributions:end -->
+
 ## Licence
 
 MIT. See [LICENSE](LICENSE), and [ATTRIBUTIONS.md](ATTRIBUTIONS.md) for the work this rests
