@@ -5,7 +5,7 @@
 > Resolume**, on either platform. What's measured is measured by an offline harness that
 > drives the real plugin class in a headless GL context on a synthetic clock, on this Mac's
 > GPU at two rasters, and reads the light back out of the plugin's own buffers and pixels.
-> Along a ray from a star, the gas's recombination light adds up to **0.991** and **0.995**
+> Along a ray from a star, the gas's recombination light adds up to **0.996** and **1.001**
 > of the ionising photons the star sent that way (1 is every photon accounted for). The
 > ionisation zones stand in the physics' order, [O III] nearest the star, then H, then
 > [S II], then the aromatics, each more than a field texel apart. A star's diffraction core
@@ -165,7 +165,7 @@ renderer** at 320×180. What it establishes:
 
 | check | result |
 | --- | --- |
-| `--photons` | a slab of gas lit along its axis: the recombination light summed along the ray, Σ E d² dx, over what the star sent, **0.991** at 1280×720, **0.995** at 320×180, **1.007** on the software renderer (bound 5%, the half-float buffers and a bilinear front) |
+| `--photons` | a slab of gas lit along its axis: the recombination light summed along the ray, Σ E d² dx, over what the star sent, **0.996** at 1280×720, **1.001** at 320×180, **1.007** on the software renderer (bound 5%, the half-float buffers and a bilinear front) |
 | `--strata` | mean depth into the gas of each zone's light: [O III] **0.017** < H **0.047** < [S II] **0.107** < aromatics **0.127** frame heights, each more than a field texel (0.003) apart; a hotter star makes relatively more [O III] |
 | `--psf` | the core's width through Hubble's F658N over F502N, from each channel's peak over its total: **1.312** at 1920×1080, **1.310** at 3840×2160, against the pivots' **1.314** (bound 5%) |
 | `--spikes` | Hubble: spikes at **45°, 135°, 225°, 315°**; Webb: **0°, 30°, 90°, 150°, 180°, 210°, 270°, 330°**; Hubble's along its length, halo subtracted, **r^−2.00** (bound 0.3) |

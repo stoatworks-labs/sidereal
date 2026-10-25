@@ -12,6 +12,8 @@
 *.xcodeproj/xcuserdata/
 /build-*/
 
-# The research scripts write their states and bytecode next to themselves
+# Python bytecode
 __pycache__/
-tools/research/**/*.npy
+
+# Claude sessions' worktrees
+/.claude/

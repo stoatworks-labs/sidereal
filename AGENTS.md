@@ -50,8 +50,8 @@ far away) read from the mip level each step spans, and lengthened by d3/r for a 
 the plane. What survives sets the emission per unit area:
 
 - **H** (recombination): E = EmitH × IonK Σ × F e^{−τ}. Integrated along a ray, Σ α e^{−τ} ds
-  = 1 − e^{−τ_total}: the photon budget, which `--photons` measures from the picture (0.991
-  and 0.995).
+  = 1 − e^{−τ_total}: the photon budget, which `--photons` measures from the picture (0.996
+  and 1.001).
 - **[O III]**: the zone the hard photons (>35.1 eV) reach, F h e^{−3τ}, h the O++ share of
   the star's ionising photons from the closed-form series of the Planck photon integral.
   Its strength is normalised to a 40 kK star's hardness (`HardRef`) and saturates at four
