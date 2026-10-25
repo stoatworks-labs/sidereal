@@ -2,7 +2,10 @@
 
 > **AI-assisted project.** This codebase was created with [Claude](https://claude.com/claude-code)
 > (Anthropic), directed and reviewed by a human author. It has **never been loaded into
-> Resolume**, on either platform. What's measured is measured by an offline harness that
+> Resolume on macOS**, where it is loaded by [oxbow](https://github.com/stoatworks-labs/oxbow), a
+> real FFGL host that is not Resolume. On Windows the fleet's gate loads both plugins in Resolume
+> Arena 7.27.1 on a software renderer, checks their controls and renders through them; no one has
+> played a show with it. What's measured is measured by an offline harness that
 > drives the real plugin class in a headless GL context on a synthetic clock, on this Mac's
 > GPU at two rasters, and reads the light back out of the plugin's own buffers and pixels.
 > Along a ray from a star, the gas's recombination light adds up to **0.996** and **1.001**
@@ -14,7 +17,7 @@
 > star behind a dust column dims in red, green and blue exactly as Cardelli, Clayton &
 > Mathis's law through each filter predicts, to three figures. A lens's Einstein ring lands
 > within a pixel of its radius; a light echo's ring at **0.3424** frame heights against the
-> paraboloid's **0.3428**. **13** deliberately wrong models and **16** one-character mutants
+> paraboloid's **0.3428**. **13** deliberately wrong models and **18** one-character mutants
 > of the shipped code are all caught. What the pictures look like next to the real releases
 > is a judgement, not a measurement: see [Status](#status).
 
@@ -159,11 +162,11 @@ Pillars.
 
 ## Status
 
-**v0.1.0, unreleased, 25 October 2026: local only, early days.**
+**v0.1.0, 25 October 2026: the first release, and early days.**
 
 ### Measured offline, on macOS
 
-`tools/verify.sh` passes on this machine (Apple Silicon, macOS 26) against a fresh universal
+`tools/verify.sh` passes on this machine (Apple M4 Max, macOS 26.4.1) against a fresh universal
 Release build (25 October 2026, under eight minutes). It runs every picture check at **two rasters**, 1280×720 and 320×180
 (except where a check says otherwise), and five of them again on **Apple's software
 renderer** at 320×180. What it establishes:
@@ -176,46 +179,74 @@ renderer** at 320×180. What it establishes:
 | `--spikes` | Hubble: spikes at **45°, 135°, 225°, 315°**; Webb: **0°, 30°, 90°, 150°, 180°, 210°, 270°, 330°**; Hubble's along its length, halo subtracted, **r^−2.00** (bound 0.3) |
 | `--reddening` | a 6000 K star behind τ_V = 1.6 of dust, its transmission in the picture R **0.360**, G **0.197**, B **0.130**, against **0.360, 0.197, 0.130** from the CCM law through each filter in double; both rasters |
 | `--parallax` | stars and gas at depths 0.5 and 2 as the camera pans 0.2: moved **−0.4000** and **−0.1000** frame heights, the law exactly; the gas within a field texel |
-| `--lens` | a lensed deep field's brightest pixels no brighter than the unlensed field's (**0.759** against **0.774**, 99.9th percentile); the Einstein ring at **0.1493** frame heights for θ_E 0.15 (one pixel) |
+| `--lens` | a lensed deep field's brightest pixels no brighter than the unlensed field's (**0.674** against **0.692**, 99.9th percentile); the Einstein ring at **0.1493** frame heights for θ_E 0.15 (one pixel) |
 | `--echo` | a light echo off a dust sheet 0.05 in front, day 100: the ring at **0.3424** and **0.3417** frame heights, the paraboloid of constant delay at **0.3428** |
 | `--meteor` | one meteor's light frame by frame: brightest at **0.833 s** and **0.800 s** of a 1.000 s flight, theory **0.781 s** plus its 0.12 s wake; gone to **4%** of peak 0.3 s after the end |
 | `--hardness` | the O++ share of a blackbody's ionising photons, by its series, against Simpson's rule on x²/(eˣ − 1): equal to **1e-7** from x₀ 0.5 to 20 |
 | `--extinction` | A_λ/A_V against Cardelli, Clayton & Mathis's Table 3 from U to K: within **2%** (the table's rounding); continuous past 3.33 µm; A_8/A_K **0.42** (Indebetouw: about 0.4); the 9.7 µm silicate bump |
 | `--cosmology` | D_A against 10-point Gauss–Legendre to **1e-6**; **1651.91 Mpc** at z = 1 (Wright: 1651.9); galaxies stop shrinking at z = **1.61** |
 | `--supernova` | peak on day **15.3**; Arnett's rule, light at peak against the decay heating then, to **0.04%**; the tail at **1.29 mag per 100 days** (observed type Ia tails 1.2–1.6, cobalt alone 0.98); the remnant as t¹ then t^0.4 |
-| `--meteorcurve` | the classical curve peaks at x = 1.00000 at height 1, is gone at x = 3; 24 shower meteors all on their radiant lines to **3e-8** |
+| `--meteorcurve` | the classical curve peaks at x = 1.00000 at height 1, is gone at x = 3; 24 shower meteors all on their radiant lines to **8e-8**; **960** presses of Fire Meteor, sporadic and shower, each a fireball (peak 40 or more) lasting **0.92 s** or longer with its trail on a 4:3 picture |
 | `--palette` | each narrow band passes its own line; every filter of every telescope stretched to its own light to **2e-16**; unbalanced keys make an equal signal grey, balanced ones a 5800 K star; the tables are the exact sums to a float's rounding |
+| `--targets` | every target at its defaults, 640×360: the dimmest's 99th percentile **0.34** (floor 0.18; the Pleiades was 0.09 before its fix), none with over **0.83%** of its pixels clipped (limit 2%) |
 | `--names`, `--state`, `--resize`, `--alpha` | names under 16 characters and unique, the GLSL's sizes, rows and hook bits the C++'s; the host's blend, viewport and units back as found; a resized instance **0** different from a fresh one; the Over at Mix 0 returns the clip, its alpha mix(clip, 1, Mix) |
 | `--pipe` | both plugins: 2.5 frames in, exactly 2 out; a closed stdout (`\| head -c 1`) exits 1, not 141 |
 | `--negative` | **13** deliberately wrong models, **13** caught |
-| mutation | **16** one-character mutants of the shipped GLSL and C++, **16** caught |
+| mutation | **18** one-character mutants of the shipped GLSL and C++, **18** caught |
 | `tools/sweep.py` | all **30** controls of the source and **32** of the Over that have pixels measurably change the picture |
 | shaders | all 6 compile through `glslc`, not merely through Apple's driver |
 | the bundles | both universal (`x86_64 arm64`), export `plugMain`, ad-hoc sign; `oxbow` reports `SW Sidereal` / `SD01` / `source` and `SW Sidereal Over` / `SD02` / `effect` and renders through both |
 
 Render cost, GPU time by `GL_TIME_ELAPSED`, median of 60 frames after a warm-up, from
-verify.sh's own run on an M4 Max: the Pillars **0.97 ms** at 720p, **1.99 ms** at 1080p,
-**7.7 ms** at 4K; the Cosmic Cliffs 1.08, 2.18 and 8.3 ms; the Whirlpool 1.36, 2.91 and
-11.4 ms; the lensed First Deep 1.30, 2.66 and 10.1 ms; the Over on the Pillars 0.97, 1.99 and
-7.7 ms. Most of it is per pixel, so it scales with the raster; a smaller GPU will feel 4K.
+verify.sh's own run on an M4 Max: the Pillars **0.96 ms** at 720p, **1.98 ms** at 1080p,
+**7.6 ms** at 4K; the Cosmic Cliffs 1.07, 2.16 and 8.2 ms; the Whirlpool 1.36, 2.90 and
+11.4 ms; the lensed First Deep 1.19, 2.47 and 9.4 ms; the Over on the Pillars 0.98, 2.08 and
+8.1 ms. Most of it is per pixel, so it scales with the raster; a smaller GPU will feel 4K.
 macOS figures only.
+
+### In Resolume, on Windows
+
+The fleet's Arena gate (`plugin-bench`, on win-lab: Resolume Arena 7.27.1 under Mesa's llvmpipe
+software renderer) takes CI's build of the release code: both DLLs load, both plugins register
+(`SD01` a source, `SD02` an effect) and appear in Arena's lists, all 35 and 38 controls match their
+names, order, types, ranges and defaults (the Over's include Arena's own Opacity), the names at
+FFGL's 16-character limit come through whole, each renders a frame with content, and Arena logged
+no shader errors and survived the run: **15 passed, 0 failed, 2 skipped**. Against stills, 24 of
+the source's 25 testable controls and 27 of the Over's 28 moved the picture; Meteors, random and a
+pixel or two wide, was inconclusive, and Meteor Kind, SN Speed and Light Echo act only on meteors
+or a supernova, which a still never has. A first run, on the build before the guide's fixes, passed
+everything but a row missing from the expectation. Software rendering says nothing about a GPU or
+about speed, and nobody has played a show with it.
+
+### Found before release, and fixed
+
+Writing the user guide meant rendering every claim in it, and that turned up what the checks
+hadn't looked at. Each fix has a comment in the code saying what it was, and AGENTS.md has the
+list: Fire Meteor did nothing on about one press in ten (now a fireball placed on the picture,
+checked over 960 presses); the Pleiades was black at its defaults (now checked, with every
+other target, by `--targets`); deep-field galaxies had square edges where they outgrew the
+search for them; the planetaries were filled discs rather than rings, and bipolar ones had two
+dark bites out of them; Orion's Bar threw a hard black wedge to the corner; a ridge ran across
+the Pillars' feet; the Sombrero had a one-row step along its middle; and Hubble Infrared sat
+two stops below every other telescope.
 
 ### Not established
 
-It's **never been loaded into Resolume**, on either platform. Everything above was compiled,
-rendered and measured offline against the plugin's own class in a headless CGL context, plus
-an `oxbow` load. I haven't seen how the controls read in Arena's inspector, how the events
-feel on a show, or how it runs on anything slower than this Mac. Nothing has been built or run
-on Windows, and the workflows in `.github/` have never run.
+It's **never been loaded into Resolume on macOS**; there it has only run in `oxbow`, the
+fleet's own FFGL test host. I haven't seen how the events feel on a show, or how it runs on
+anything slower than this Mac.
 
 **The pictures are like the releases, not copies of them.** The Pillars, Cosmic Cliffs and
 Horsehead are traced from their releases and land recognisably; the rest are built from what
 their releases show. The colour of each telescope comes from its real filters and colour key,
 but the strengths of the lines, the dust's glow and the stars against each other are this
-model's, tuned by eye against the releases. Some land well (the Ring and the Pillars through
-Hubble, the Horsehead, the galaxies); some don't yet: the Pillars through Webb come out grey
-where the release is amber, the Cosmic Cliffs' ridge is a harder line than Webb's, and the
-planetaries through Webb's own keys are faint.
+model's, tuned by eye against the releases. Some land well (the Pillars through Hubble, the
+Horsehead, the galaxies, the Ring through Hubble's narrow bands); some don't yet: the Pillars
+through Webb come out grey where the release is amber, the Cosmic Cliffs' ridge is a harder
+line than Webb's, and the planetaries through Webb's own keys come out blue and lilac where the
+releases are orange and red. Dust stops dimming past an optical depth of 12, Flow turns the
+galaxies' arms, the supernova's remnant is the same size on every target, and Fly replaces the
+faint stars, the infrared's embedded ones too. The user guide's *Known limits* has the rest.
 
 **The model's approximations**, all in AGENTS.md: the gas is a picture, flat, with a depth
 along the line of sight that the light pass knows only as each element's thickness; the
@@ -226,7 +257,7 @@ hard photons, not computed from oxygen's cooling; the faces of the gas towards u
 a height field of its column; meteors appear through space telescopes, which are above the
 air and would see none.
 
-There's a user guide, but no browser demo, no OpenFX port and no presets yet.
+There's a user guide, but no browser demo, no OpenFX port, no presets and no audio drive yet.
 
 ## Build
 
