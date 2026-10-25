@@ -32,7 +32,7 @@ gain rule (`physics::BuildPalette` and each target's `Mix`), the continuum norma
 - A clip through it: `ffmpeg -i in.mov -vf fps=60 -f rawvideo -pix_fmt rgba - | ./build/sdtest --over --pipe --size WxH | ffmpeg …`
 
 ## Verify
-- Everything: `tools/verify.sh` (about forty minutes; set `TMPDIR` to a scratch directory in
+- Everything: `tools/verify.sh` (under eight minutes on an M4 Max; set `TMPDIR` to a scratch directory in
   a sandboxed session or `glslc.sh` hangs on its heredoc; `OXBOW=` points at an oxbow binary
   if `~/Projects/resolume/oxbow/build/oxbow` isn't built).
 - **No GL** (`--offline` runs these and their negatives): `--hardness`, `--extinction`,

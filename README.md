@@ -159,7 +159,7 @@ Pillars.
 ### Measured offline, on macOS
 
 `tools/verify.sh` passes on this machine (Apple Silicon, macOS 26) against a fresh universal
-Release build. It runs every picture check at **two rasters**, 1280×720 and 320×180
+Release build (25 October 2026, under eight minutes). It runs every picture check at **two rasters**, 1280×720 and 320×180
 (except where a check says otherwise), and five of them again on **Apple's software
 renderer** at 320×180. What it establishes:
 
@@ -188,11 +188,12 @@ renderer** at 320×180. What it establishes:
 | shaders | all 6 compile through `glslc`, not merely through Apple's driver |
 | the bundles | both universal (`x86_64 arm64`), export `plugMain`, ad-hoc sign; `oxbow` reports `SW Sidereal` / `SD01` / `source` and `SW Sidereal Over` / `SD02` / `effect` and renders through both |
 
-Render cost, GPU time by `GL_TIME_ELAPSED`, median of 60 frames after a warm-up, on an M4 Max
-with other work on the machine: the Pillars **0.96 ms** at 720p, **1.98 ms** at 1080p,
-**7.6 ms** at 4K; the Cosmic Cliffs 1.07, 2.15 and 8.2 ms; the Whirlpool 1.35, 2.89 and
-11.3 ms; the lensed First Deep 1.27, 2.65 and 10.1 ms; the Over on the Pillars 0.99, 2.00 and
-7.7 ms. Most of it is per pixel, so it scales with the raster. macOS figures only.
+Render cost, GPU time by `GL_TIME_ELAPSED`, median of 60 frames after a warm-up, from
+verify.sh's own run on an M4 Max: the Pillars **0.97 ms** at 720p, **1.99 ms** at 1080p,
+**7.7 ms** at 4K; the Cosmic Cliffs 1.08, 2.18 and 8.3 ms; the Whirlpool 1.36, 2.91 and
+11.4 ms; the lensed First Deep 1.30, 2.66 and 10.1 ms; the Over on the Pillars 0.97, 1.99 and
+7.7 ms. Most of it is per pixel, so it scales with the raster; a smaller GPU will feel 4K.
+macOS figures only.
 
 ### Not established
 
@@ -258,7 +259,7 @@ tools/verify.sh
 Everything: shader hygiene, `glslc`, a fresh universal build with no warnings, both bundles
 through lipo, the plist, an ad-hoc signature and `oxbow`, every check at both rasters, five
 again on the software renderer, the pipe contract, the negative controls, the mutants, the
-sweep and the bench. About forty minutes here, most of it the mutants. In a sandboxed Claude
+sweep and the bench. Under eight minutes on this Mac, most of it the mutants' builds. In a sandboxed Claude
 session set `TMPDIR` to a writable scratch directory first. `CLAUDE.md` has the harness's
 commands.
 
