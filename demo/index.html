@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sidereal — browser demo | Stoatworks Labs</title>
+    <meta name="description" content="Try the Sidereal FFGL source and effect for Resolume in your browser: nebulae, galaxies and starfields built the way Hubble's and Webb's pictures are, gas lit by its stars and seen through the telescopes' real filters and colour keys. The plugin's own four GLSL passes, ported to WebGL2 unedited, fed by a JavaScript port of its CPU half (the telescopes' filter tables, every target, the meteors and the supernova) that a check in its repository holds to the plugin's C++. A demo, not the plugin." />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./vendor/kit.css" />
+    <link rel="canonical" href="https://sidereal-demo.stoatworks-labs.com/" />
+  </head>
+  <body>
+    <main id="demo">
+      <noscript>
+        <p>
+          This demo runs the plugin's shaders and a port of its CPU half in your
+          browser, so it needs JavaScript and WebGL2. The plugin itself, its
+          source and its downloads are on
+          <a href="https://github.com/stoatworks-labs/sidereal">its repository</a>.
+        </p>
+      </noscript>
+    </main>
+
+    <script type="module" src="./plugin.js"></script>
+    <script
+      src="./vendor/support-footer.js"
+      defer
+      data-app="Sidereal"
+      data-repo="https://github.com/stoatworks-labs/sidereal"
+      data-note="A browser demo of the plugin's shaders over a port of its CPU half. Nothing you load here leaves your machine."
+    ></script>
+  </body>
+</html>
