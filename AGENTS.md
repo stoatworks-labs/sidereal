@@ -293,8 +293,82 @@ exposure and stretch, the continuum normalisations' constants, the galaxies' gai
   onset drive (regauss's) is the obvious v0.2.
 - Presets beyond the targets: Resolume saves parameter presets itself; nothing shipped.
 
+## The browser demo
+
+`demo/` is the page at <https://sidereal-demo.stoatworks-labs.com/>, built 2026-10-28: Worker
+`sidereal-demo`, a route on a proxied AAAA 100:: record (the zone's custom domains are full;
+delete the record and the page goes dark while its deploys stay green), redeployed by
+`.github/workflows/deploy.yml` on a push to main. `demo/vendor/` is the shared kit from
+stoatworks-backend's `resolume-demo/kit`; never edit it, re-vendor it.
+
+**What is the plugin and what is a port.** The four passes' GLSL is the plugin's, spliced into
+`demo/shaders.js` by `demo/tools/check_shaders.py --write` and compared character for character,
+the assembly included. Everything the shaders read is built in JavaScript. The PORT block of
+`demo/plugin.js` is Physics.cpp (BuildPalette and everything under it, the light curve, the
+cosmology), Controls.cpp, Scene.cpp (every target, and the PCG32 behind them with its 64-bit state
+in BigInt) and Events.cpp; the FRAME block is ProcessOpenGL's CPU half, as a class whose `frame()`
+returns the uploads and the uniforms, so the GL code only binds and draws. JavaScript has no erfc
+or tgamma: the port carries fdlibm's erfc and a Lanczos gamma (only ever asked for Γ(8) and Γ(4.4)).
+The C++'s float arithmetic is written `f32( ... )` an operation at a time.
+
+**How it is held to the plugin** (`demo/tools/crosscheck/crosscheck.sh`, run by verify.sh, about
+two minutes; `CROSSCHECK_KEEP=dir` keeps the printouts):
+
+- printer.cpp against run.mjs, the PORT block: 123,432 lines, 122,418 identical to the bit. Every
+  float the GPU reads from all 48 palettes (twelve instruments by four mixes) is identical; every
+  target at ten seeds and the generative ones at every third seed is identical in structure, its
+  stars' floats within 2 ulps; six event runs, 24,000 frames, identical; doubles within 7e-15
+  relative.
+- uniforms.cpp against frames.mjs, the FRAME block: the real class in a CGL context through 4,430
+  frames of both plugins, with Sidereal.cpp compiled `-DglTexImage2D=recordTexImage2D` so every
+  table it uploads is printed at the call. Every uniform of all four programs is identical to the
+  bit; the palettes, outlines and light curve are identical; 68 of 2,061,928 element and sprite
+  table values are 1 ulp apart.
+- compare.py's limits (floats 64 ulps, doubles 1e-10 relative) are a libm's reach, not a port
+  error's, and its docstring says why. There is no libm replay (slipstream has one); the counts
+  above say how little it would buy.
+- Built `-ffp-contract=off`, the x86_64 slice's arithmetic. The arm64 build's fused multiply-adds
+  are reported, not required: they move a sprite or a scene's float by at most 0.004 (thousands of
+  ulps where the value sits near zero).
+
+**Pixels, checked once (2026-10-28).** The page's renderer, driven headlessly (Chrome, ANGLE on
+Metal) through the same 180 frames at 60 fps from t = 0 as `sdtest --out`: the Pillars as released
+and through NIRCam, the Cosmic Cliffs, Orion through MIRI, the Ring, the Whirlpool, the First Deep
+Field and Gen Nebula at seed 500, at 1280×720; the Over with Clip As Gas (on a card, a grey, a
+gradient) and Behind, at 640×360 and 906×394 (whose field is 512×256). 99.86% to 99.99% of pixels
+identical, every other one within one level of 255.
+
+**Traps**
+
+- That comparison first had the Over's Clip As Gas 15% different, 57 levels at worst, in a band
+  along the top. The harness's test clip had no wrap mode, and WebGL's default is REPEAT: the
+  field's margin samples the clip at its clamped edge, which REPEAT blends with the opposite edge.
+  The kit's clips are CLAMP_TO_EDGE; a harness's clip has to be too.
+- The seeded generator matches only if the port makes its calls in clang's order. Several builders
+  make two Random calls in one argument list (`star( ..., fieldTemperature( r ), layer,
+  r.range( 0.5f, 3.0f ) )` in every field of bright stars; most `blob`, `planetary` and `spiral`
+  calls in the generative targets), and C++ leaves the order of a call's arguments unspecified:
+  clang goes left to right, MSVC is free not to. **So the Windows build may place the bright field
+  stars, and build the generative skies, differently from the macOS build for the same seed.** Not
+  checked on Windows. Hoisting those calls into named locals in Scene.cpp would pin it (the port
+  already reads that way).
+- `std::cos` of a float is `cosf`, and `g.bulgeAxis * g.bulgeAxis * si` is a float product before it
+  meets a double: those are where a careless port drifts by an ulp.
+
+**Gaps the page states**: the clock's seconds-or-milliseconds vote is not ported; Fire Meteor and
+Supernova are toggles the page releases after a frame; the harness hooks are not ported; the
+palette tables and light curve fall back to half float without OES_texture_float_linear; the sprite
+pass's vertex texture fetch is lowp in GLSL ES unless the driver ignores that; no audio (the plugin
+has none either).
+
+**Verifying the page**: serve `demo/` locally and load it headlessly. `window.siderealDemo` has the
+pieces: `renderer.processFrame( renderer.newInstance( isEffect ), input, w, h, t, fbo )` renders one
+plugin frame into a framebuffer of yours, which is how the pixel comparison above was driven, and
+`renderer.stats` is what the status line shows. `?plugin=over`, `?embed=1` and every control id as a
+query parameter work.
+
 ## Not done
 
-Never loaded into Resolume on macOS. No browser demo, OpenFX port, presets or audio drive.
+Never loaded into Resolume on macOS. No OpenFX port, presets or audio drive.
 Released as v0.1.0 (public repo, site page and user guide); the Windows build is gated in
 Arena on win-lab by plugin-bench's `arena/expect/sidereal.json`.

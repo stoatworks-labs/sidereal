@@ -82,10 +82,28 @@ gain rule (`physics::BuildPalette` and each target's `Mix`), the continuum norma
 - Public at <https://github.com/stoatworks-labs/sidereal>, released as v0.1.0 on
   25 October 2026, with a page and a user guide on stoatworks-labs.com.
 
+## Browser demo
+- `demo/` is the page at https://sidereal-demo.stoatworks-labs.com (Cloudflare Worker
+  `sidereal-demo`, a ROUTE on a proxied AAAA 100:: record -- the zone's custom domains are full;
+  deleting the record takes the page dark with a green deploy). `deploy.yml` redeploys it on a
+  push to main; by hand: `cf-run npx wrangler deploy`.
+- `demo/shaders.js` is GENERATED: after changing `source/Shaders.cpp` run
+  `python3 demo/tools/check_shaders.py --write`; verify.sh fails on drift, on a new piece the
+  check does not list, and on a change to how pieces are joined.
+- `demo/plugin.js`'s PORT block (Physics, Controls, Scene, Events) and FRAME block
+  (ProcessOpenGL's CPU half: it RETURNS each pass's uploads and uniforms) are held to the C++ by
+  `demo/tools/crosscheck/crosscheck.sh` (verify.sh runs it; needs node, the submodule and a GL
+  context, ~2 min): change the C++ and the port with it. A new uniform is a new entry in the
+  FRAME block, or the check fails on the plugin's value; a new table is a new `uploads.push`.
+- No libm replay: compare.py holds floats to 64 ulps and doubles to 1e-10 relative, and reports
+  how many are identical (AGENTS.md has the numbers).
+- `demo/vendor/` is the shared kit: never edit it, re-vendor from stoatworks-backend's
+  `resolume-demo/kit`.
+
 ## Not done yet
 - Never loaded into Resolume on macOS. The Windows build is gated in Arena on win-lab
   (plugin-bench's `arena/expect/sidereal.json`).
-- No browser demo, no OpenFX port, no presets, no audio drive.
+- No OpenFX port, no presets, no audio drive.
 
 ## Diagnostics
 

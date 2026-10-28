@@ -800,8 +800,9 @@ clock arrives in.
 - **No audio input.** Map Fire Meteor and Supernova to Resolume's audio analysis, BPM or cues.
 - **The looks were judged by eye** on the harness's renders, and the Over has only been seen with
   the harness's test card and a white word on black.
-- **No presets beyond the targets, no OpenFX version and no browser demo.** Resolume saves parameter
-  presets itself.
+- **No presets beyond the targets and no OpenFX version.** Resolume saves parameter presets itself.
+- **The browser demo is a demo, not the plugin.** It runs the plugins' own shaders and a JavaScript
+  port of the rest in WebGL2, with no Resolume, and lists on the page what it doesn't reproduce.
 
 ---
 
@@ -815,6 +816,8 @@ this guide, the project page, the source on GitHub and the support page in your 
 - Project page: [stoatworks-labs.com/software/sidereal](https://stoatworks-labs.com/software/sidereal/)
 - Source: [github.com/stoatworks-labs/sidereal](https://github.com/stoatworks-labs/sidereal)
 - User guide: [stoatworks-labs.com/software/sidereal/guide](https://stoatworks-labs.com/software/sidereal/guide/)
+- Browser demo: [sidereal-demo.stoatworks-labs.com](https://sidereal-demo.stoatworks-labs.com/), both plugins
+  in your browser, nothing to install
 
 ## Reporting something
 

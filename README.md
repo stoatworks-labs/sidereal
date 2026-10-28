@@ -72,6 +72,7 @@ macOS builds are signed and notarised and open normally. The Windows builds are 
 <!-- downloads:end -->
 
 There's a [user guide](https://stoatworks-labs.com/software/sidereal/guide/) (also as [PDF](https://stoatworks-labs.com/guides/sidereal.pdf)): every target and telescope, every control, and recipes for shows.
+You can also try both plugins in a [browser demo](https://sidereal-demo.stoatworks-labs.com/) without installing anything; it's a demo, not the plugin, and it says what it leaves out.
 
 ## Video
 
@@ -290,7 +291,23 @@ hard photons, not computed from oxygen's cooling; the faces of the gas towards u
 a height field of its column; meteors appear through space telescopes, which are above the
 air and would see none.
 
-There's a user guide, but no browser demo, no OpenFX port, no presets and no audio drive yet.
+There's a user guide and a [browser demo](#browser-demo), but no OpenFX port, no presets and no audio drive yet.
+
+## Browser demo
+
+**<https://sidereal-demo.stoatworks-labs.com/>** — both plugins, every control with its own name,
+group and default, and two buttons for the events. The field, light, sprite and composite passes
+are the plugin's own GLSL, spliced unedited into `demo/shaders.js` (`demo/tools/check_shaders.py`,
+run by `tools/verify.sh`, fails on a changed character). The CPU half is a JavaScript port — the
+telescopes' tables (`Physics.cpp`), every target and the seeded generator behind the generative ones
+(`Scene.cpp`), the meteors and the supernova (`Events.cpp`), the mappings (`Controls.cpp`) and each
+frame's uniforms (`Sidereal.cpp`) — and `demo/tools/crosscheck/` holds it to the plugin: the port
+against the plugin's own C++ (122,418 of 123,432 lines identical to the bit, every palette float the
+GPU reads identical, the rest a libm's last place or two apart), and the port's frame logic against
+the **real plugin class** in a GL context, every table it uploads and every uniform of its four
+programs read back over 4,430 frames: every uniform the same float. Frames drawn by the page and by
+`sdtest` at the same settings agree to within one level of 255. It is still not the plugin: no
+Resolume, WebGL2 rather than GL 4.1, and the page lists what else it doesn't reproduce.
 
 ## Build
 
